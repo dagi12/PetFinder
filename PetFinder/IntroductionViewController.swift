@@ -14,22 +14,21 @@ class IntroductionViewController: UIViewController {
   @IBOutlet weak var petProfilePictureImageView: UIImageView!
   @IBOutlet weak var petNameAgeLabel: UILabel!
   
-  var originalProfileCenter = CGPointZero
-  var lastTouchPoint = CGPointZero
+  var originalProfileCenter = CGPoint.zero
+  var lastTouchPoint = CGPoint.zero
   
   var currentPet = Pet.randomPet()
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
     setPetProfile()
     
     petProfileView.layer.cornerRadius = 8.0
     
     petProfilePictureImageView.layer.cornerRadius = 8.0
-    petProfilePictureImageView.backgroundColor = UIColor.lightGrayColor()
+    petProfilePictureImageView.backgroundColor = UIColor.lightGray
     
-    let pan = UIPanGestureRecognizer(target: self, action: "didPan:")
+    let pan = UIPanGestureRecognizer(target: self, action: Selector(("didPan:")))
     petProfileView.addGestureRecognizer(pan)
   }
   
@@ -48,23 +47,24 @@ class IntroductionViewController: UIViewController {
   
   func didPan(pan: UIPanGestureRecognizer) {
     switch pan.state {
-    case .Began:
-      lastTouchPoint = pan.locationInView(view)
-    case .Changed:
-      let deltaX = pan.locationInView(view).x - lastTouchPoint.x
-      let deltaY = pan.locationInView(view).y - lastTouchPoint.y
+    case .began:
+        lastTouchPoint = pan.location(in: view)
+    case .changed:
+        let deltaX = pan.location(in: view).x - lastTouchPoint.x
+        let deltaY = pan.location(in: view).y - lastTouchPoint.y
       
       petProfileView.center = CGPoint(x: petProfileView.center.x + deltaX, y: petProfileView.center.y + deltaY)
-      lastTouchPoint = pan.locationInView(view)
-    case .Ended:
-      let velocity = pan.velocityInView(view)
+        lastTouchPoint = pan.location(in: view)
+    case .ended:
+        let velocity = pan.velocity(in: view)
       
       if abs(velocity.x) < 100 && abs(velocity.y) < 100 {
         animateProfileViewToOriginalPostion()
       } else {
         animateProfileViewOffscreen(withVelocity: velocity)
       }
-    case .Cancelled, .Failed:
+
+    case .cancelled, .failed:
       animateProfileViewToOriginalPostion()
     default:
       break
@@ -72,7 +72,7 @@ class IntroductionViewController: UIViewController {
   }
   
   func animateProfileViewOffscreen(withVelocity velocity: CGPoint) {
-    if petProfileView.center.x < UIScreen.mainScreen().bounds.size.width/2.0 {
+    if petProfileView.center.x < UIScreen.main.bounds.size.width/2.0 {
       animateProfileViewLeft()
     } else {
       animateProfileViewRight()
@@ -81,44 +81,44 @@ class IntroductionViewController: UIViewController {
   
   func animateProfileViewLeft() {
     let animation = CABasicAnimation(keyPath: "position")
-    animation.toValue = NSValue(CGPoint: CGPoint(x: -(petProfileView.bounds.size.width), y: petProfileView.center.y))
-    animation.fromValue = NSValue(CGPoint: petProfileView.center)
+    animation.toValue = NSValue(cgPoint: CGPoint(x: -(petProfileView.bounds.size.width), y: petProfileView.center.y))
+    animation.fromValue = NSValue(cgPoint: petProfileView.center)
     animation.duration = 0.25
-    animation.timingFunction =  CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
-    animation.removedOnCompletion = true
+    animation.timingFunction =  CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+    animation.isRemovedOnCompletion = true
     
     CATransaction.begin()
     CATransaction.setCompletionBlock { () -> Void in
       self.resetPet()
     }
     
-    petProfileView.layer.addAnimation(animation, forKey: "position")
-    petProfileView.layer.position = animation.toValue!.CGPointValue
+    petProfileView.layer.add(animation, forKey: "position")
+    petProfileView.layer.position = (animation.toValue! as AnyObject).cgPointValue
     CATransaction.commit()
   }
   
   func animateProfileViewRight() {
     let animation = CABasicAnimation(keyPath: "position")
-    animation.toValue = NSValue(CGPoint: CGPoint(x: UIScreen.mainScreen().bounds.size.width + petProfileView.bounds.size.width, y: petProfileView.center.y))
-    animation.fromValue = NSValue(CGPoint: petProfileView.center)
+    animation.toValue = NSValue(cgPoint: CGPoint(x: UIScreen.main.bounds.size.width + petProfileView.bounds.size.width, y: petProfileView.center.y))
+    animation.fromValue = NSValue(cgPoint: petProfileView.center)
     animation.duration = 0.25
-    animation.timingFunction =  CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
-    animation.removedOnCompletion = true
+    animation.timingFunction =  CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+    animation.isRemovedOnCompletion = true
     
-    animation.delegate = self
+    animation.delegate = (self as! CAAnimationDelegate)
     
     CATransaction.begin()
     CATransaction.setCompletionBlock { () -> Void in
       if let image = self.petProfilePictureImageView.image {
-        self.currentPet.imageData = UIImageJPEGRepresentation(image, 0)!
+        self.currentPet.imageData = image.jpegData(compressionQuality: 0)
       }
       self.currentPet.id = MatchedPetsManager.sharedManager.matchedPets.count + 1
-      MatchedPetsManager.sharedManager.addPet(self.currentPet)
+        MatchedPetsManager.sharedManager.addPet(pet: self.currentPet)
       self.resetPet()
     }
     
-    petProfileView.layer.addAnimation(animation, forKey: "position")
-    petProfileView.layer.position = animation.toValue!.CGPointValue
+    petProfileView.layer.add(animation, forKey: "position")
+    petProfileView.layer.position = (animation.toValue! as AnyObject).cgPointValue
     CATransaction.commit()
   }
   
@@ -133,33 +133,30 @@ class IntroductionViewController: UIViewController {
   
   func animateProfileViewToOriginalPostion() {
     let animation = CABasicAnimation(keyPath: "position")
-    animation.toValue = NSValue(CGPoint: originalProfileCenter)
-    animation.fromValue = NSValue(CGPoint: petProfileView.center)
+    animation.toValue = NSValue(cgPoint: originalProfileCenter)
+    animation.fromValue = NSValue(cgPoint: petProfileView.center)
     animation.duration = 0.25
-    animation.timingFunction =  CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
-    animation.removedOnCompletion = true
+    animation.timingFunction =  CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+    animation.isRemovedOnCompletion = true
     
-    petProfileView.layer.addAnimation(animation, forKey: "position")
-    petProfileView.layer.position = animation.toValue!.CGPointValue
+    petProfileView.layer.add(animation, forKey: "position")
+    petProfileView.layer.position = (animation.toValue! as AnyObject).cgPointValue
   }
   
   func fadeInProfileView() {
     let animation = CABasicAnimation(keyPath: "opacity")
-    animation.toValue = NSNumber(float: 1.0)
-    animation.fromValue = NSNumber(float: 0.0)
+    animation.toValue = NSNumber(value: 1.0)
+    animation.fromValue = NSNumber(value: 0.0)
     animation.duration = 0.25
     
-    petProfileView.layer.addAnimation(animation, forKey: "opacity")
+    petProfileView.layer.add(animation, forKey: "opacity")
     petProfileView.layer.opacity = 1.0
   }
   
   func setPetProfile() {
     petNameAgeLabel.text = "\(currentPet.name), \(currentPet.age)"
-    petProfilePictureImageView.loadURL(currentPet.imageURL)
+    petProfilePictureImageView.loadURL(url: currentPet.imageURL as URL)
   }
   
-  override func preferredStatusBarStyle() -> UIStatusBarStyle {
-    return .LightContent
-  }
   
 }

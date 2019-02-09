@@ -10,14 +10,14 @@ import Foundation
 import UIKit
 
 class PetNetworking {
-  class func fetchImageAtURL(url:String, success:(UIImage?) -> Void) {
-    
-    let urlRequest = NSURLRequest(URL: NSURL(string: url)!)
-    
-    NSURLSession.sharedSession().dataTaskWithRequest(urlRequest) { (data, response, error) -> Void in
-      if let response = response, data = data where response.isHTTPResponseValid() {
-        success(UIImage(data: data))
-      }
+    class func fetchImageAtURL(url:String, success:@escaping (UIImage?) -> Void) {
+        
+        let urlRequest = NSURLRequest(url: NSURL(string: url)! as URL)
+        
+        URLSession.shared.dataTask(with: urlRequest as URLRequest) { (data, response, error) -> Void in
+            if let _ = response, let data = data {
+                success(UIImage(data: data))
+            }
+        }
     }
-  }
 }

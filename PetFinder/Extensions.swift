@@ -9,35 +9,36 @@
 import UIKit
 
 extension UIImageView {
-  
-  func loadURL(url: NSURL?) {
-    guard let url = url else {
-      return
+    
+    func loadURL(url: URL?) {
+        guard let url = url else {
+            return
+        }
+        let urlRequest = URLRequest(url: url)
+        
+        URLSession.shared.dataTask(with: urlRequest) { (data, response, error) -> Void in
+            if let response = response, let data = data, response.isHTTPResponseValid() {
+                DispatchQueue.main.async {
+                    if UIImage(data: data) == nil {
+                        self.image = UIImage(named: "standardCat")
+                    } else {
+                        self.image = UIImage(data: data)
+                    }
+                }
+                
+            }
+            }
+            .resume()
     }
     
-    let urlRequest = NSURLRequest(URL: url)
-    
-    NSURLSession.sharedSession().dataTaskWithRequest(urlRequest) { (data, response, error) -> Void in
-      if let response = response, data = data where response.isHTTPResponseValid() {
-        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-          if UIImage(data: data) == nil {
-            self.image = UIImage(named: "standardCat")
-          } else {
-            self.image = UIImage(data: data)
-          }
-        })
-      }
-      }.resume()
-  }
-  
 }
 
-extension NSURLResponse {
-  func isHTTPResponseValid() -> Bool {
-    guard let response = self as? NSHTTPURLResponse else {
-      return false
+extension URLResponse {
+    func isHTTPResponseValid() -> Bool {
+        guard let response = self as? HTTPURLResponse else {
+            return false
+        }
+        
+        return (response.statusCode >= 200 && response.statusCode <= 299)
     }
-    
-    return (response.statusCode >= 200 && response.statusCode <= 299)
-  }
 }

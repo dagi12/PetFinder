@@ -26,19 +26,19 @@ class Pet: NSObject {
   required convenience init(coder decoder: NSCoder) {
     self.init()
     
-    if let archivedName = decoder.decodeObjectForKey("name") as? String {
+    if let archivedName = decoder.decodeObject(forKey: "name") as? String {
       name = archivedName
     }
     
-    if let archivedAge = decoder.decodeObjectForKey("age") as? Int {
+    if let archivedAge = decoder.decodeObject(forKey: "age") as? Int {
       age = archivedAge
     }
     
-    if let archivedImage = decoder.decodeObjectForKey("image") {
+    if let archivedImage = decoder.decodeObject(forKey: "image") {
       imageData = archivedImage as! NSData
     }
     
-    id = decoder.decodeIntegerForKey("id")
+    id = decoder.decodeInteger(forKey: "id")
   }
   
   class func randomPet() -> Pet {
@@ -68,12 +68,12 @@ class Pet: NSObject {
 }
 
 extension Pet: NSCoding {
-  
-  func encodeWithCoder(coder: NSCoder) {
-    coder.encodeObject(name, forKey: "name")
-    coder.encodeObject(age, forKey: "age")
-    coder.encodeObject(imageData, forKey: "image")
-    coder.encodeInteger(id, forKey: "id")
-  }
+    
+    func encode(with coder: NSCoder) {
+        coder.encode(name, forKey: "name")
+        coder.encode(age, forKey: "age")
+        coder.encode(imageData, forKey: "image")
+        coder.encode(id, forKey: "id")
+    }
   
 }

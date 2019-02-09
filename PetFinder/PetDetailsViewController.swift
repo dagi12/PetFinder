@@ -18,10 +18,10 @@ class PetDetailsViewController: UIViewController {
   
   override func viewDidLoad() {
     profilePictureImageView.layer.cornerRadius = 4.0
-    profilePictureImageView.layer.borderColor = UIColor.whiteColor().CGColor
+    profilePictureImageView.layer.borderColor = UIColor.white.cgColor
     profilePictureImageView.layer.borderWidth = 2.0
     
-    let editButton = UIBarButtonItem(title: "Edit", style: UIBarButtonItemStyle.Plain, target: self, action: #selector(PetDetailsViewController.editWasTapped(_:)))
+    let editButton = UIBarButtonItem(title: "Edit", style: UIBarButtonItem.Style.plain, target: self, action: #selector(PetDetailsViewController.editWasTapped(sender:)))
     navigationItem.rightBarButtonItem = editButton
   }
   
@@ -33,17 +33,13 @@ class PetDetailsViewController: UIViewController {
     navigationController?.pushViewController(vc, animated: true)
   }
   
-  override func viewWillAppear(animated: Bool) {
-    guard let petId = petId, pet = MatchedPetsManager.sharedManager.petForId(petId) else {
+    override func viewWillAppear(_ animated: Bool) {
+    guard let petId = petId, let pet = MatchedPetsManager.sharedManager.petForId(id: petId) else {
       return
     }
     
     currentPet = pet
     setPet()
-  }
-  
-  override func preferredStatusBarStyle() -> UIStatusBarStyle {
-    return .LightContent
   }
   
   func setPet() {
@@ -53,6 +49,6 @@ class PetDetailsViewController: UIViewController {
     
     title = currentPet.name
     nameAgeLabel.text = "\(currentPet.name), \(currentPet.age)"
-    profilePictureImageView.image = UIImage(data: currentPet.imageData)
+    profilePictureImageView.image = UIImage(data: currentPet.imageData as Data)
   }
 }

@@ -11,76 +11,75 @@ import UIKit
 private let reuseIdentifier = "PetCell"
 
 class MatchedPetsCollectionViewController: UICollectionViewController {
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
     
-    clearsSelectionOnViewWillAppear = false
-    
-    collectionView!.backgroundColor = UIColor.clearColor()
-    
-    title = "Matches"
-  }
-  
-  override func viewDidAppear(animated: Bool) {
-    let selectedItems: [NSIndexPath]? = collectionView?.indexPathsForSelectedItems()
-    if selectedItems?.count != 0 {
-      UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: { () -> Void in
-        self.collectionView!.deselectItemAtIndexPath((selectedItems?.first)!, animated: true)
-        }, completion: nil)
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        clearsSelectionOnViewWillAppear = false
+        
+        collectionView!.backgroundColor = UIColor.clear
+        
+        title = "Matches"
     }
     
-  }
-  
-  override func viewWillAppear(animated: Bool) {
-    if MatchedPetsManager.sharedManager.matchedPets.count != collectionView?.numberOfItemsInSection(0) {
-      collectionView?.reloadData()
+    override func viewDidAppear(_ animated: Bool) {
+        let selectedItems = collectionView?.indexPathsForSelectedItems
+        if selectedItems?.count != 0 {
+            UIView.animate(withDuration: 0.3, delay: 0.0, options: UIView.AnimationOptions.curveLinear, animations: { () -> Void in
+                self.collectionView!.deselectItem(at: (selectedItems?.first)! as IndexPath, animated: true)
+            }, completion: nil)
+        }
+        
     }
-  }
-  
-  // MARK: - Navigation
-  
-  override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-    let cell: PetCell? = sender as? PetCell
-    let vc: PetDetailsViewController? = segue.destinationViewController as? PetDetailsViewController
     
-    if let cell = cell, vc = vc {
-      cell.selected = true
-      vc.petId = cell.petId
+    override func viewWillAppear(_ animated: Bool) {
+        if MatchedPetsManager.sharedManager.matchedPets.count != collectionView?.numberOfItems(inSection: 0) {
+            collectionView?.reloadData()
+        }
     }
-  }
-  
-  // MARK: UICollectionViewDataSource
-  
-  override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-    return 1
-  }
-  
-  override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return MatchedPetsManager.sharedManager.matchedPets.count
-  }
-  
-  override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-    let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! PetCell
     
-    cell.petId = MatchedPetsManager.sharedManager.matchedPets[indexPath.row].id
+    // MARK: - Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let cell: PetCell? = sender as? PetCell
+        let vc: PetDetailsViewController? = segue.destination as? PetDetailsViewController
+        
+        if let cell = cell, let vc = vc {
+            cell.isSelected = true
+            vc.petId = cell.petId
+        }
+    }
     
-    return cell
-  }
-  
-  // MARK: UICollectionViewDelegate
-  
-  // Uncomment this method to specify if the specified item should be selected
-  override func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-    return true
-  }
-  
-  // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-  override func collectionView(collectionView: UICollectionView, shouldShowMenuForItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-    return false
-  }
-  
-  override func collectionView(collectionView: UICollectionView, canPerformAction action: Selector, forItemAtIndexPath indexPath: NSIndexPath, withSender sender: AnyObject?) -> Bool {
-    return false
-  }
+    // MARK: UICollectionViewDataSource
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return MatchedPetsManager.sharedManager.matchedPets.count
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath as IndexPath) as! PetCell
+        
+        cell.petId = MatchedPetsManager.sharedManager.matchedPets[indexPath.row].id
+        
+        return cell
+    }
+    // MARK: UICollectionViewDelegate
+    
+    
+    // Uncomment this method to specify if the specified item should be selected
+    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
+    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
+        return false
+    }
 }

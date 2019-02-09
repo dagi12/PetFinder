@@ -14,35 +14,35 @@ class MatchedPetsManager {
   
   private let fileName = "petArray"
   
-  var matchedPets = [Pet]()
+    var matchedPets = [Pet]()
   
   init() {
     unarchivePets()
   }
   
   func addPet(pet: Pet) {
-    matchedPets.insert(pet, atIndex: 0)
+    matchedPets.insert(pet, at: 0)
   }
   
   func unarchivePets() {
-    let dirPath = NSSearchPathForDirectoriesInDomains(.LibraryDirectory, .UserDomainMask, true)[0] as String
+    let dirPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] as String
     let pathArray = [dirPath, fileName]
-    let fileURL =  NSURL.fileURLWithPathComponents(pathArray)!
+    let fileURL =  NSURL.fileURL(withPathComponents: pathArray)!
     
-    if let path = fileURL.path, pets = NSKeyedUnarchiver.unarchiveObjectWithFile(path) {
-      matchedPets = pets as! [Pet]
+    if let pets = NSKeyedUnarchiver.unarchiveObject(withFile: fileURL.path) {
+        matchedPets = pets as! [Pet]
     }
   }
   
   func archivePets() {
-    let dirPath = NSSearchPathForDirectoriesInDomains(.LibraryDirectory, .UserDomainMask, true)[0] as String
+    let dirPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] as String
     let pathArray = [dirPath, fileName]
-    let fileURL =  NSURL.fileURLWithPathComponents(pathArray)!
+    let fileURL =  NSURL.fileURL(withPathComponents: pathArray)!
     
-    NSKeyedArchiver.archiveRootObject(matchedPets, toFile: fileURL.path!)
+    NSKeyedArchiver.archiveRootObject(matchedPets, toFile: fileURL.path)
   }
   
-  func updatePet(id id: Int, name: String?, age: String?) {
+    func updatePet(id: Int, name: String?, age: String?) {
     guard let name = name, let age = Int(age ?? "0") else { return }
     
     for pet in matchedPets {
